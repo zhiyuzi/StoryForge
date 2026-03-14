@@ -22,12 +22,19 @@ allowed-tools: Read, Write, Agent, Glob, Grep
 根据产物类型选择评估 Agent 组合：
 
 **梗概评估：**
-- 叙事评审 Agent（.claude/agents/narrative-reviewer.md）
-  - 维度：叙事效率、冲突处理、爽点密度、钩子强度
+- 叙事评审 Agent（.claude/agents/narrative-reviewer.md）— 叙事效率、冲突处理、爽点密度、钩子强度
+- 逻辑审计 Agent（.claude/agents/logic-auditor.md）— 逻辑一致性、付费点优化、赛道匹配度
 
-**剧本评估：**
-- 叙事评审 Agent — 叙事效率、冲突处理、爽点密度、钩子强度
-- （P1 阶段补充：规范检查 Agent、角色评审 Agent、逻辑审计 Agent）
+**剧本评估（全部 4 个评估 Agent）：**
+- 规范检查 Agent（.claude/agents/format-checker.md）— 格式规范（确定性检查）
+- 叙事评审 Agent（.claude/agents/narrative-reviewer.md）— 叙事效率、冲突处理、爽点密度、钩子强度
+- 角色评审 Agent（.claude/agents/character-reviewer.md）— 角色一致性、情感深度
+- 逻辑审计 Agent（.claude/agents/logic-auditor.md）— 逻辑一致性、付费点优化、赛道匹配度
+
+**分镜评估：**
+- 规范检查 Agent — 格式规范
+- 叙事评审 Agent — 视觉叙事效率、钩子强度
+- 逻辑审计 Agent — 逻辑一致性、赛道匹配度
 
 ### 3. 执行评估
 - 调用选定的评估 Agent
