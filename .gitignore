@@ -1,0 +1,6 @@
+# Project docs (spec, design — not versioned)
+.docs/
+
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.json
+CLAUDE.local.md

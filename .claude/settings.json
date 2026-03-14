@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '提示：文件已写入。如果是剧本或梗概，建议运行 /evaluate 进行评估。'"
+          }
+        ]
+      }
+    ]
+  }
+}
