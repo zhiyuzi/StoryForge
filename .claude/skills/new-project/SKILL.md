@@ -1,7 +1,6 @@
 ---
 name: new-project
 description: 初始化一个新的短剧创作项目并启动采访流程
-allowed-tools: Read, Write, Agent, Glob
 ---
 # 新建项目
 

@@ -1,5 +1,6 @@
 ---
-globs: projects/*/branches/*/script/**
+paths:
+  - projects/*/branches/*/script/**
 ---
 写剧本时必须遵守以下规范：
 

@@ -1,7 +1,6 @@
 ---
 name: compare
 description: 对比当前项目的并行分支，生成 comparison.md 和推荐排名
-allowed-tools: Read, Write, Agent, Glob, Grep
 ---
 # 对比并行分支
 

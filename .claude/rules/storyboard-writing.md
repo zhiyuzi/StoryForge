@@ -1,5 +1,6 @@
 ---
-globs: projects/*/branches/*/storyboard/**
+paths:
+  - projects/*/branches/*/storyboard/**
 ---
 写分镜时必须遵守以下规范：
 

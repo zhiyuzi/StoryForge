@@ -1,7 +1,6 @@
 ---
 name: evaluate
 description: 对指定产物运行完整评估，自动选择对应的评估 Agent 组合
-allowed-tools: Read, Write, Agent, Glob, Grep
 ---
 # 评估产物
 
