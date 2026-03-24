@@ -50,39 +50,39 @@ So the harness here does not treat the model as a black-box function call. It tr
 
 ```mermaid
 flowchart TD
-    A[Goal Layer<br/>Turn open-ended creative intent<br/>into auditable outputs] --> B
+    A["Goal Layer<br/>Turn open-ended creative intent<br/>into auditable outputs"] --> B
 
     subgraph Context["Context Layer"]
-        B[creative brief]
-        C[story-pack]
-        D[approved synopsis]
+        B["creative brief"]
+        C["story-pack"]
+        D["approved synopsis"]
     end
 
     subgraph Orchestration["Orchestration Layer"]
-        E[/new-project]
-        F[synopsis-generator]
-        G{output branch}
-        H[script-generator]
-        I[storyboard-generator]
+        E["/new-project"]
+        F["synopsis-generator"]
+        G{"output branch"}
+        H["script-generator"]
+        I["storyboard-generator"]
     end
 
     subgraph Review["Review Layer"]
-        J[narrative-reviewer]
-        K[logic-auditor]
-        L[character-reviewer]
-        M[format-checker]
+        J["narrative-reviewer"]
+        K["logic-auditor"]
+        L["character-reviewer"]
+        M["format-checker"]
     end
 
     subgraph Constraint["Constraint Layer"]
-        N[hard gate:<br/>no approved synopsis,<br/>no downstream generation]
-        O[generator and evaluator<br/>must stay isolated]
-        P[convergence-aware stop policy]
+        N["hard gate:<br/>no approved synopsis,<br/>no downstream generation"]
+        O["generator and evaluator<br/>must stay isolated"]
+        P["convergence-aware stop policy"]
     end
 
     subgraph Audit["Audit Layer"]
-        Q[changelog.md]
-        R[*-eval.md]
-        S[projects/* artifacts]
+        Q["changelog.md"]
+        R["*-eval.md"]
+        S["projects/* artifacts"]
     end
 
     B --> C
@@ -205,4 +205,3 @@ You can inspect example projects directly:
 - teams building controllable workflows for content generation
 - researchers interested in Harness Engineering for uncertainty computation
 - anyone who wants a Markdown-native, auditable, replayable Agent project example
-
