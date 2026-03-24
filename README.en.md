@@ -5,12 +5,13 @@
 <h1 align="center">StoryForge</h1>
 
 <p align="center">
-  A Claude Code-based Agent Runtime for Harness Engineering under uncertainty
+  A Claude Code-based story generation Agent Runtime for computation under uncertainty
 </p>
 
 <p align="center">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Agent%20Runtime-111827?style=flat-square">
-  <img alt="Harness Engineering" src="https://img.shields.io/badge/Harness%20Engineering-Uncertainty%20Computation-0f766e?style=flat-square">
+  <img alt="Story Generation" src="https://img.shields.io/badge/Story-Generation%20Workflow-b91c1c?style=flat-square">
+  <img alt="Harness Engineering" src="https://img.shields.io/badge/Harness%20Engineering-Computation%20Under%20Uncertainty-0f766e?style=flat-square">
   <img alt="Synopsis Gate" src="https://img.shields.io/badge/Flow-Synopsis%20Gate%20First-7c3aed?style=flat-square">
   <img alt="Evals" src="https://img.shields.io/badge/Evals-6%2F6%20Passing-16a34a?style=flat-square">
   <img alt="Artifacts" src="https://img.shields.io/badge/Artifacts-Markdown%20Native-f59e0b?style=flat-square">
@@ -27,16 +28,16 @@ This repository should be read as a standalone runtime project. The tracked stru
 | Dimension | Description |
 | --- | --- |
 | Project type | Claude Code-based Agent Runtime |
-| Core thesis | Harness Engineering for uncertainty computation |
+| Core thesis | Harness Engineering for computation under uncertainty |
 | Demonstration scenario | Synopsis, script, and storyboard workflows |
 | Key mechanisms | Context assembly, hard gates, role isolation, review loops, convergence stops, audit trails |
 | Execution model | Claude Code + Markdown-native repo structure |
 
-## Why Harness Engineering for Uncertainty Computation
+## Why Harness Engineering for Computation Under Uncertainty
 
 Many Harness Engineering discussions focus on deterministic computation: compiling, testing, tool orchestration, data transformation, and rule-based validation. Those tasks usually have stable I/O, clearer correctness, and near-binary pass/fail conditions.
 
-StoryForge is aimed at a different class of work: uncertainty computation.
+StoryForge is aimed at a different class of work: computation under uncertainty.
 
 - The output is not a single correct answer but a set of plausible candidates.
 - Quality is judged through rubrics, reviewer agents, and human approval rather than one assertion.
@@ -203,5 +204,5 @@ You can inspect example projects directly:
 
 - developers exploring Claude Code as a multi-agent runtime host
 - teams building controllable workflows for content generation
-- researchers interested in Harness Engineering for uncertainty computation
+- researchers interested in Harness Engineering for computation under uncertainty
 - anyone who wants a Markdown-native, auditable, replayable Agent project example
