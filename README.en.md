@@ -47,90 +47,138 @@ StoryForge is aimed at a different class of work: computation under uncertainty.
 
 So the harness here does not treat the model as a black-box function call. It treats generation, review, revision, stop conditions, and archiving as runtime primitives.
 
-## Harness Logic
+## System Diagrams
+
+The three diagrams below are reused from the project's internal system design set. Together they show StoryForge from three complementary angles: end-to-end flow, runtime architecture, and the evaluation/revision loop.
+
+### Diagram 1: Main Flow
+
+This diagram shows the path from a raw idea to a final output such as a script or storyboard. The red gate marks the mandatory human approval point.
 
 ```mermaid
 flowchart TD
-    A["Goal Layer<br/>Turn open-ended creative intent<br/>into auditable outputs"] --> B
+    A([用户提出创意]) --> B["采访补全<br>interviewer.md"]
+    B --> C["生成 story-pack.md"]
+    C --> D["生成梗概<br>synopsis-generator.md"]
+    D --> E{"梗概评估<br>narrative-reviewer.md<br>logic-auditor.md"}
+    E -->|达标| F
+    E -->|不达标| G[自动修正]
+    G --> D
+    F:::hardgate
+    F{"用户确认梗概?<br>→ approved.md"}
+    F -->|确认| H{选择输出格式}
+    F -->|修改意见| D
+    H -->|剧本| I["生成剧本<br>script-generator.md"]
+    H -->|分镜| J["生成分镜<br>storyboard-generator.md"]
+    I --> K{"剧本评估<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
+    K -->|达标| L([剧本完成])
+    K -->|不达标| M[自动修正]
+    M --> I
+    J --> N{"分镜评估<br>narrative-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
+    N -->|达标| O([分镜完成])
+    N -->|不达标| P[自动修正]
+    P --> J
 
-    subgraph Context["Context Layer"]
-        B["creative brief"]
-        C["story-pack"]
-        D["approved synopsis"]
+    classDef hardgate stroke:#e74c3c,stroke-width:3px
+    classDef user fill:#3498db,color:#fff
+    classDef gen fill:#2ecc71,color:#fff
+    classDef eval fill:#f39c12,color:#fff
+
+    class A,F user
+    class B,C,D,I,J gen
+    class E,K,N eval
+```
+
+### Diagram 2: Runtime Architecture
+
+This view emphasizes the runtime layers: Skills orchestrate, Agents execute, Knowledge supports, Rules inject constraints, and Hooks provide reminders after tool events.
+
+```mermaid
+flowchart TB
+    subgraph Skills[".claude/skills/ — 技能层"]
+        S1["new-project 新建项目<br>SKILL.md"]
+        S2["evaluate 评估产物<br>SKILL.md"]
+        S3["compare 对比分支<br>SKILL.md"]
     end
 
-    subgraph Orchestration["Orchestration Layer"]
-        E["/new-project"]
-        F["synopsis-generator"]
-        G{"output branch"}
-        H["script-generator"]
-        I["storyboard-generator"]
+    subgraph GenAgents[".claude/agents/ — 生成 Agent"]
+        GA1["interviewer.md<br>采访 Agent"]
+        GA2["synopsis-generator.md<br>梗概生成"]
+        GA3["script-generator.md<br>剧本生成"]
+        GA4["storyboard-generator.md<br>分镜生成"]
     end
 
-    subgraph Review["Review Layer"]
-        J["narrative-reviewer"]
-        K["logic-auditor"]
-        L["character-reviewer"]
-        M["format-checker"]
+    subgraph EvalAgents[".claude/agents/ — 评估 Agent"]
+        EA1["narrative-reviewer.md<br>叙事评审"]
+        EA2["character-reviewer.md<br>角色评审"]
+        EA3["logic-auditor.md<br>逻辑审计"]
+        EA4["format-checker.md<br>格式检查"]
     end
 
-    subgraph Constraint["Constraint Layer"]
-        N["hard gate:<br/>no approved synopsis,<br/>no downstream generation"]
-        O["generator and evaluator<br/>must stay isolated"]
-        P["convergence-aware stop policy"]
+    subgraph Knowledge["knowledge/ — 知识库"]
+        K1["genres/<br>赛道知识 ×4"]
+        K2["structure/<br>结构模型 ×3"]
+        K3["evaluation/<br>评分标准 ×4"]
+        K4["style-guide/<br>风格指南 ×3"]
+        K5["templates/<br>输出模板 ×3"]
     end
 
-    subgraph Audit["Audit Layer"]
-        Q["changelog.md"]
-        R["*-eval.md"]
-        S["projects/* artifacts"]
+    subgraph Rules[".claude/rules/ — 规则层"]
+        R1["script-writing.md<br>剧本规则 → script/**"]
+        R2["storyboard-writing.md<br>分镜规则 → storyboard/**"]
     end
 
-    B --> C
-    C --> E
-    E --> F
-    F --> J
-    F --> K
-    J -->|revise| F
-    K -->|revise| F
-    J --> D
-    K --> D
-    D --> G
-    G --> H
-    G --> I
-    H --> J
-    H --> K
-    H --> L
-    H --> M
-    I --> J
-    I --> K
-    I --> M
-    J -->|revise| H
-    K -->|revise| H
-    L -->|revise| H
-    M -->|revise| H
-    J -->|revise| I
-    K -->|revise| I
-    M -->|revise| I
-    N -.guards.-> H
-    N -.guards.-> I
-    O -.isolates.-> J
-    O -.isolates.-> K
-    O -.isolates.-> L
-    O -.isolates.-> M
-    P -.stops.-> J
-    P -.stops.-> K
-    P -.stops.-> L
-    P -.stops.-> M
-    F --> Q
-    H --> Q
-    I --> Q
-    J --> R
-    K --> R
-    L --> R
-    M --> R
-    Q --> S
-    R --> S
+    subgraph Hook[".claude/settings.json — 钩子层"]
+        H1["PostToolUse: Write<br>提醒运行 /evaluate"]
+    end
+
+    Skills -->|调度| GenAgents
+    Skills -->|调度| EvalAgents
+    GenAgents -->|参考| Knowledge
+    EvalAgents -->|依据| Knowledge
+    Rules -.->|路径匹配时<br>自动注入| GenAgents
+    Hook -.->|Write 事件后<br>触发提醒| GenAgents
+
+    classDef skill fill:#9b59b6,color:#fff
+    classDef gen fill:#2ecc71,color:#fff
+    classDef eval fill:#f39c12,color:#fff
+    classDef know fill:#3498db,color:#fff
+    classDef rule fill:#e74c3c,color:#fff
+    classDef hook fill:#95a5a6,color:#fff
+
+    class S1,S2,S3 skill
+    class GA1,GA2,GA3,GA4 gen
+    class EA1,EA2,EA3,EA4 eval
+    class K1,K2,K3,K4,K5 know
+    class R1,R2 rule
+    class H1 hook
+```
+
+### Diagram 3: Evaluation and Auto-Revision Loop
+
+This view focuses on what happens after generation. The runtime scores artifacts, detects convergence or stagnation, and stops rather than revising forever.
+
+```mermaid
+flowchart TD
+    A["生成产物<br>synopsis/v1.md 或 ep01.md"] --> B["评估 Agent 打分<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"]
+    B --> C{"所有维度 ≥ 3/5?<br>依据: synopsis-rubric.md<br>或 script-rubric.md"}
+    C -->|是| D(["通过<br>→ *-eval.md"])
+    C -->|否| E{"检测分数趋势<br>CLAUDE.md 停机策略"}
+    E -->|"收敛: S2 > S1"| F{"超过硬上限?<br>梗概 3轮 / 剧本 5轮"}
+    E -->|"停滞: S2 ≈ S1"| G(["停止, 交给用户"])
+    E -->|"发散: S2 < S1"| H(["立即停止, 交给用户"])
+    E -->|"振荡: 有涨有跌"| I(["停止, 交给用户"])
+    F -->|未超过| J["针对性修正<br>→ v2.md / v3.md"]
+    F -->|超过上限| K(["强制停止, 交给用户"])
+    J --> B
+
+    classDef pass fill:#2ecc71,color:#fff
+    classDef stop fill:#e74c3c,color:#fff
+    classDef check fill:#f39c12,color:#fff
+
+    class D pass
+    class G,H,I,K stop
+    class C,E,F check
 ```
 
 ## This Is Not a One-Click Generator
@@ -194,11 +242,10 @@ You can inspect example projects directly:
 ## Quick Start
 
 1. Clone the repository and open it in Claude Code.
-2. Let Claude Code load the project rules from [CLAUDE.md](./CLAUDE.md).
-3. Use `/new-project` with a creative brief.
-4. Review the generated `story-pack.md` and `synopsis/v1.md`.
-5. Run `/evaluate` on artifacts and inspect the revision loop.
-6. Approve the synopsis before continuing to script or storyboard generation.
+2. Use `/new-project` with a creative brief.
+3. Review the generated `story-pack.md` and `synopsis/v1.md`.
+4. Run `/evaluate` on artifacts and inspect the revision loop.
+5. Approve the synopsis before continuing to script or storyboard generation.
 
 ## Who This Is For
 
