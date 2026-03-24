@@ -57,26 +57,26 @@ This diagram shows the path from a raw idea to a final output such as a script o
 
 ```mermaid
 flowchart TD
-    A([用户提出创意]) --> B["采访补全<br>interviewer.md"]
-    B --> C["生成 story-pack.md"]
-    C --> D["生成梗概<br>synopsis-generator.md"]
-    D --> E{"梗概评估<br>narrative-reviewer.md<br>logic-auditor.md"}
-    E -->|达标| F
-    E -->|不达标| G[自动修正]
+    A([User Brief]) --> B["Interview / Fill Gaps<br>interviewer.md"]
+    B --> C["Build story-pack.md"]
+    C --> D["Generate Synopsis<br>synopsis-generator.md"]
+    D --> E{"Synopsis Review<br>narrative-reviewer.md<br>logic-auditor.md"}
+    E -->|Pass| F
+    E -->|Revise| G[Auto Revision]
     G --> D
     F:::hardgate
-    F{"用户确认梗概?<br>→ approved.md"}
-    F -->|确认| H{选择输出格式}
-    F -->|修改意见| D
-    H -->|剧本| I["生成剧本<br>script-generator.md"]
-    H -->|分镜| J["生成分镜<br>storyboard-generator.md"]
-    I --> K{"剧本评估<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
-    K -->|达标| L([剧本完成])
-    K -->|不达标| M[自动修正]
+    F{"Synopsis Approved?<br>→ approved.md"}
+    F -->|Approved| H{Choose Output}
+    F -->|Feedback| D
+    H -->|Script| I["Generate Script<br>script-generator.md"]
+    H -->|Storyboard| J["Generate Storyboard<br>storyboard-generator.md"]
+    I --> K{"Script Review<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
+    K -->|Pass| L([Script Complete])
+    K -->|Revise| M[Auto Revision]
     M --> I
-    J --> N{"分镜评估<br>narrative-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
-    N -->|达标| O([分镜完成])
-    N -->|不达标| P[自动修正]
+    J --> N{"Storyboard Review<br>narrative-reviewer.md<br>logic-auditor.md<br>format-checker.md"}
+    N -->|Pass| O([Storyboard Complete])
+    N -->|Revise| P[Auto Revision]
     P --> J
 
     classDef hardgate stroke:#e74c3c,stroke-width:3px
@@ -95,49 +95,49 @@ This view emphasizes the runtime layers: Skills orchestrate, Agents execute, Kno
 
 ```mermaid
 flowchart TB
-    subgraph Skills[".claude/skills/ — 技能层"]
-        S1["new-project 新建项目<br>SKILL.md"]
-        S2["evaluate 评估产物<br>SKILL.md"]
-        S3["compare 对比分支<br>SKILL.md"]
+    subgraph Skills[".claude/skills/ — Skills Layer"]
+        S1["new-project<br>New Project"]
+        S2["evaluate<br>Evaluate Artifact"]
+        S3["compare<br>Compare Branches"]
     end
 
-    subgraph GenAgents[".claude/agents/ — 生成 Agent"]
-        GA1["interviewer.md<br>采访 Agent"]
-        GA2["synopsis-generator.md<br>梗概生成"]
-        GA3["script-generator.md<br>剧本生成"]
-        GA4["storyboard-generator.md<br>分镜生成"]
+    subgraph GenAgents[".claude/agents/ — Generation Agents"]
+        GA1["interviewer.md<br>Interview Agent"]
+        GA2["synopsis-generator.md<br>Synopsis Generation"]
+        GA3["script-generator.md<br>Script Generation"]
+        GA4["storyboard-generator.md<br>Storyboard Generation"]
     end
 
-    subgraph EvalAgents[".claude/agents/ — 评估 Agent"]
-        EA1["narrative-reviewer.md<br>叙事评审"]
-        EA2["character-reviewer.md<br>角色评审"]
-        EA3["logic-auditor.md<br>逻辑审计"]
-        EA4["format-checker.md<br>格式检查"]
+    subgraph EvalAgents[".claude/agents/ — Evaluation Agents"]
+        EA1["narrative-reviewer.md<br>Narrative Review"]
+        EA2["character-reviewer.md<br>Character Review"]
+        EA3["logic-auditor.md<br>Logic Audit"]
+        EA4["format-checker.md<br>Format Check"]
     end
 
-    subgraph Knowledge["knowledge/ — 知识库"]
-        K1["genres/<br>赛道知识 ×4"]
-        K2["structure/<br>结构模型 ×3"]
-        K3["evaluation/<br>评分标准 ×4"]
-        K4["style-guide/<br>风格指南 ×3"]
-        K5["templates/<br>输出模板 ×3"]
+    subgraph Knowledge["knowledge/ — Knowledge Base"]
+        K1["genres/<br>Genre Knowledge x4"]
+        K2["structure/<br>Structure Models x3"]
+        K3["evaluation/<br>Evaluation Rubrics x4"]
+        K4["style-guide/<br>Style Guides x3"]
+        K5["templates/<br>Output Templates x3"]
     end
 
-    subgraph Rules[".claude/rules/ — 规则层"]
-        R1["script-writing.md<br>剧本规则 → script/**"]
-        R2["storyboard-writing.md<br>分镜规则 → storyboard/**"]
+    subgraph Rules[".claude/rules/ — Rules Layer"]
+        R1["script-writing.md<br>Script Rules → script/**"]
+        R2["storyboard-writing.md<br>Storyboard Rules → storyboard/**"]
     end
 
-    subgraph Hook[".claude/settings.json — 钩子层"]
-        H1["PostToolUse: Write<br>提醒运行 /evaluate"]
+    subgraph Hook[".claude/settings.json — Hook Layer"]
+        H1["PostToolUse: Write<br>Remind to run /evaluate"]
     end
 
-    Skills -->|调度| GenAgents
-    Skills -->|调度| EvalAgents
-    GenAgents -->|参考| Knowledge
-    EvalAgents -->|依据| Knowledge
-    Rules -.->|路径匹配时<br>自动注入| GenAgents
-    Hook -.->|Write 事件后<br>触发提醒| GenAgents
+    Skills -->|orchestrates| GenAgents
+    Skills -->|orchestrates| EvalAgents
+    GenAgents -->|references| Knowledge
+    EvalAgents -->|uses| Knowledge
+    Rules -.->|path-matched injection| GenAgents
+    Hook -.->|reminder after Write| GenAgents
 
     classDef skill fill:#9b59b6,color:#fff
     classDef gen fill:#2ecc71,color:#fff
@@ -160,16 +160,16 @@ This view focuses on what happens after generation. The runtime scores artifacts
 
 ```mermaid
 flowchart TD
-    A["生成产物<br>synopsis/v1.md 或 ep01.md"] --> B["评估 Agent 打分<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"]
-    B --> C{"所有维度 ≥ 3/5?<br>依据: synopsis-rubric.md<br>或 script-rubric.md"}
-    C -->|是| D(["通过<br>→ *-eval.md"])
-    C -->|否| E{"检测分数趋势<br>CLAUDE.md 停机策略"}
-    E -->|"收敛: S2 > S1"| F{"超过硬上限?<br>梗概 3轮 / 剧本 5轮"}
-    E -->|"停滞: S2 ≈ S1"| G(["停止, 交给用户"])
-    E -->|"发散: S2 < S1"| H(["立即停止, 交给用户"])
-    E -->|"振荡: 有涨有跌"| I(["停止, 交给用户"])
-    F -->|未超过| J["针对性修正<br>→ v2.md / v3.md"]
-    F -->|超过上限| K(["强制停止, 交给用户"])
+    A["Generate Artifact<br>synopsis/v1.md or ep01.md"] --> B["Evaluator Scoring<br>narrative-reviewer.md<br>character-reviewer.md<br>logic-auditor.md<br>format-checker.md"]
+    B --> C{"All dimensions >= 3/5?<br>Based on: synopsis-rubric.md<br>or script-rubric.md"}
+    C -->|Yes| D(["Pass<br>→ *-eval.md"])
+    C -->|No| E{"Check score trend<br>CLAUDE.md stop policy"}
+    E -->|"Converging: S2 > S1"| F{"Over hard cap?<br>Synopsis 3 rounds / Script 5 rounds"}
+    E -->|"Stagnation: S2 ≈ S1"| G(["Stop and hand off"])
+    E -->|"Diverging: S2 < S1"| H(["Stop immediately"])
+    E -->|"Oscillation: mixed up/down"| I(["Stop and hand off"])
+    F -->|Below cap| J["Targeted Revision<br>→ v2.md / v3.md"]
+    F -->|Cap reached| K(["Force stop"])
     J --> B
 
     classDef pass fill:#2ecc71,color:#fff
